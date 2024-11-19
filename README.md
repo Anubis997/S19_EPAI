@@ -1,1 +1,3 @@
 # S19_EPAI
+
+The assignment involves creating a SmartDevice class to simulate a smart device with attributes like device_name, model_number, and is_online, alongside a status dictionary for feature states. It requires methods to update, retrieve, toggle, and reset statuses, with a class-level device_count tracking the total instances created. The class should be callable, returning the device's name and model, and include a device_info function attribute to provide its current state. The implementation must pass unit tests covering initialization, method functionality, and multiple device handling.
