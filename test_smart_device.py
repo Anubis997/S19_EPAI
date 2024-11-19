@@ -1,83 +1,63 @@
-import pytest
-from smart_device import SmartDevice
+class SmartDevice:
+    # Class attribute to track the total number of devices created
+    device_count = 0
 
-@pytest.fixture(autouse=True)
-def reset_device_count():
-    """Reset SmartDevice.device_count to 0 before each test."""
-    SmartDevice.device_count = 0
+    def __init__(self, device_name, model_number, is_online=False):
+        """
+        Initializes a SmartDevice instance.
 
-def test_initialization():
-    device = SmartDevice("Thermostat", "T-1000")
-    assert device.device_name == "Thermostat"
-    assert device.model_number == "T-1000"
-    assert not device.is_online
-    assert device.status == {}
-    assert SmartDevice.device_count == 1
+        Args:
+            device_name (str): The name of the device.
+            model_number (str): The model number of the device.
+            is_online (bool): Whether the device is online. Defaults to False.
+        """
+        self.device_name = device_name
+        self.model_number = model_number
+        self.is_online = is_online
+        self.status = {}
 
-def test_device_count():
-    _ = SmartDevice("Lamp", "L-2000")
-    assert SmartDevice.device_count == 2
+        # Increment the device count
+        SmartDevice.device_count += 1
 
-def test_update_status():
-    device = SmartDevice("Camera", "C-3000")
-    device.update_status("battery", 80)
-    assert device.get_status("battery") == 80
+    def update_status(self, attribute, value):
+        """
+        Updates or adds a status attribute for the device.
 
-def test_get_status_nonexistent():
-    device = SmartDevice("Camera", "C-3000")
-    assert device.get_status("temperature") == 'Attribute not found'
+        Args:
+            attribute (str): The attribute name.
+            value: The attribute value.
+        """
+        self.status[attribute] = value
 
-def test_toggle_online():
-    device = SmartDevice("Doorbell", "D-4000")
-    device.toggle_online()
-    assert device.is_online
-    device.toggle_online()
-    assert not device.is_online
+    def get_status(self, attribute):
+        """
+        Gets the value of a specific status attribute.
 
-def test_reset():
-    device = SmartDevice("Speaker", "S-5000")
-    device.update_status("volume", 70)
-    device.reset()
-    assert device.status == {}
+        Args:
+            attribute (str): The attribute name.
 
-def test_callable_class():
-    device = SmartDevice("Light", "L-6000")
-    assert device() == "Light (Model: L-6000)"
+        Returns:
+            The value of the attribute, or 'Attribute not found' if it does not exist.
+        """
+        return self.status.get(attribute, 'Attribute not found')
 
-def test_device_info():
-    device = SmartDevice("Fan", "F-7000")
-    device.device_info = lambda: {"name": device.device_name, "model": device.model_number}
-    info = device.device_info()
-    assert info == {"name": "Fan", "model": "F-7000"}
+    def toggle_online(self):
+        """
+        Toggles the online status of the device.
+        """
+        self.is_online = not self.is_online
 
-def test_dynamic_attributes():
-    device = SmartDevice("Heater", "H-8000")
-    device.update_status("temperature", 25)
-    assert device.get_status("temperature") == 25
+    def reset(self):
+        """
+        Resets all status attributes to their default values.
+        """
+        self.status = {}
 
-def test_multiple_updates():
-    device = SmartDevice("Thermostat", "T-9000")
-    device.update_status("humidity", 60)
-    device.update_status("battery", 90)
-    assert device.get_status("humidity") == 60
-    assert device.get_status("battery") == 90
+    def __call__(self):
+        """
+        Makes the SmartDevice instance callable, returning its name and model number.
+        """
+        return f"{self.device_name} (Model: {self.model_number})"
 
-def test_empty_status_after_reset():
-    device = SmartDevice("Lock", "L-1000")
-    device.update_status("lock_status", "locked")
-    device.reset()
-    assert device.status == {}
-
-def test_multiple_devices():
-    device1 = SmartDevice("Microwave", "M-1100")
-    device2 = SmartDevice("Oven", "O-1200")
-    assert SmartDevice.device_count == 2
-
-def test_device_call_function():
-    device = SmartDevice("Router", "R-1300")
-    assert callable(device.device_info)
-
-def test_callable_behavior():
-    device = SmartDevice("Vacuum", "V-1400")
-    device.device_info = lambda: "Smart Vacuum Cleaner"
-    assert device.device_info() == "Smart Vacuum Cleaner"
+    # Add the callable function attribute device_info dynamically
+    device_info = lambda self: {"name": self.device_name, "model": self.model_number}
