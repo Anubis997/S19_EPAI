@@ -1,6 +1,10 @@
 import pytest
 from smart_device import SmartDevice
 
+def setup_function():
+    """Runs before every test to reset the device count."""
+    SmartDevice.device_count = 0
+
 def test_initialization():
     device = SmartDevice("Thermostat", "T-1000")
     assert device.device_name == "Thermostat"
@@ -11,7 +15,7 @@ def test_initialization():
 
 def test_device_count():
     _ = SmartDevice("Lamp", "L-2000")
-    assert SmartDevice.device_count == 2
+    assert SmartDevice.device_count == 1
 
 def test_update_status():
     device = SmartDevice("Camera", "C-3000")
@@ -66,7 +70,7 @@ def test_empty_status_after_reset():
 def test_multiple_devices():
     device1 = SmartDevice("Microwave", "M-1100")
     device2 = SmartDevice("Oven", "O-1200")
-    assert SmartDevice.device_count == 5
+    assert SmartDevice.device_count == 2
 
 def test_device_call_function():
     device = SmartDevice("Router", "R-1300")
